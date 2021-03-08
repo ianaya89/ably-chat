@@ -27,7 +27,6 @@ import ChatInput from '~/components/ChatInput.vue'
 import Chat from '~/components/Chat.vue'
 
 let channel = null
-const URL = process.env.APP_URL || 'http://localhost:3000'
 
 export default {
   components: { Chat, ChatInput, Login },
@@ -47,7 +46,8 @@ export default {
 
   computed: {
     chatUrl() {
-      return `${URL}/?code=${this.code}`
+      const { host, protocol } = window.location
+      return `${protocol}://${host}/?code=${this.code}`
     },
   },
 
