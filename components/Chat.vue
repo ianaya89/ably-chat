@@ -16,7 +16,7 @@
           </div>
           <div>
             <button class="mb-2 text-gray-800" @click="copyUrl">
-              {{ chatUrl }}
+              <span class="text-sm">Copy chat link</span>
               <svg
                 class="inline-flex items-center justify-center rounded-full h-5 w-5 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -38,7 +38,7 @@
       </div>
       <div class="flex flex-col items-center justify-between space-x-2">
         <span class="mb-2 text-gray-400 text-sm">
-          {{ members.length }} members</span
+          {{ onlineMembers }} members</span
         >
         <button
           type="button"
@@ -68,10 +68,8 @@
         v-for="m in messages"
         :key="m.i"
         :is-mine="isMine(m)"
-        :user-name="userName"
-      >
-        {{ m.data }}
-      </Message>
+        :message="m"
+      />
     </div>
   </div>
 </template>
@@ -86,8 +84,8 @@ export default {
   props: {
     userName: { type: String, default: '' },
     chatUrl: { type: String, default: '' },
-    members: { type: Array, default: () => [] },
     isOnline: { type: Boolean, default: false },
+    onlineMembers: { type: Number, default: 0 },
     messages: { type: Array, default: () => [] },
   },
 
@@ -101,7 +99,7 @@ export default {
     },
 
     isMine(message) {
-      return message.clientId === this.clientId
+      return message.name === this.userName
     },
   },
 }

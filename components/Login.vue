@@ -2,7 +2,7 @@
   <div class="flex flex-col justify-start items-center flex-1 h-screen">
     <Logo class="my-20" />
     <h1 class="text-gray-700 text-4xl mb-5">Real Time Chat</h1>
-    <h2 class="text-gray-700 text-lg mb-20">Ably 🧡 Nuxt.js</h2>
+    <h2 class="text-gray-700 text-lg mb-12">Ably 🧡 Nuxt.js</h2>
     <input
       v-model="userName"
       type="text"
@@ -18,9 +18,12 @@
         :class="{ 'opacity-50': !userName, 'cursor-not-allowed': !userName }"
         @click="submit"
       >
-        {{ !code ? 'Create chat' : 'Join chat #' + code }}
+        {{ !code ? 'Create chat' : 'Join chat' }}
       </button>
     </form>
+    <span v-if="code" class="mt-5 text-xs"
+      >You will join chat <b>#{{ code }}</b>
+    </span>
   </div>
 </template>
 

@@ -9,8 +9,8 @@
           <span
             class="px-4 py-2 rounded-lg inline-block text-white"
             :class="chatColor"
-            ><slot
-          /></span>
+            >{{ message.data }}</span
+          >
         </div>
       </div>
       <span
@@ -27,16 +27,16 @@
 export default {
   props: {
     isMine: { type: Boolean, default: false },
-    userName: { type: String, default: '' },
+    message: { type: Object, required: true },
   },
 
   computed: {
     initials() {
-      if (this.userName.length === 1) {
-        return this.userName
+      if (this.message.name.length === 1) {
+        return this.message.name
       }
 
-      return this.userName.substring(0, 2).toUpperCase()
+      return this.message.name.substring(0, 2).toUpperCase()
     },
 
     chatColor() {

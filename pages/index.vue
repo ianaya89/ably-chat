@@ -9,7 +9,7 @@
         :is-online="isOnline"
         :user-name="userName"
         :chat-url="chatUrl"
-        :members="members"
+        :online-members="onlineMembers"
         :messages="messages"
         @logout="logout"
       />
@@ -20,15 +20,14 @@
 
 <script>
 import Ably from 'ably'
+import { v4 as uuidv4 } from 'uuid'
 
 import Login from '@/components/Login.vue'
 import ChatInput from '~/components/ChatInput.vue'
 import Chat from '~/components/Chat.vue'
 
 let channel = null
-const URL = 'http://localhost:3000'
-// const API_URL = 'http://localhost:3000/server/auth'
-// const API_KEY = '3ddyRg.-e7qwg:eBMHfB2MA3TsbCVf'
+const URL = process.env.APP_URL || 'http://localhost:3000'
 
 export default {
   components: { Chat, ChatInput, Login },
@@ -40,7 +39,7 @@ export default {
       isOnline: false,
       isSet: false,
       messages: [],
-      members: [],
+      onlineMembers: 0,
       newMessage: '',
       clientId: null,
     }
@@ -60,11 +59,11 @@ export default {
 
       this.userName = userName
       this.isSet = true
-      this.code = this.code || Math.round(Math.random() * 10000)
+      this.code = this.code || uuidv4()
       this.setupAbly()
 
       if (!this.$route.query.code) {
-        this.$router.replace({ path: '/', qs: { code: this.code } })
+        this.$router.replace({ path: '/', query: { code: this.code } })
       }
     },
 
@@ -72,8 +71,8 @@ export default {
       if (!message || !this.isOnline || !channel) {
         return
       }
-      channel.publish(this.code, message)
-      debugger
+
+      channel.publish(this.userName, message)
       this.newMessage = ''
     },
 
@@ -85,38 +84,33 @@ export default {
       ably.connection.once('connected', () => {
         this.clientId = ably.auth.clientId
         this.isOnline = true
-        channel = ably.channels.get(this.code)
+        channel = ably.channels.get('chat:' + this.code)
 
-        channel.subscribe(this.code, (message) => {
-          console.log(message)
+        channel.subscribe((message) => {
           this.messages.push(message)
         })
 
         channel.history((err, resultPage) => {
           if (err) {
-            return
+            throw err
           }
 
           this.messages = resultPage.items.reverse()
         })
 
-        channel.presence.subscribe('enter', (member) => {
-          this.members.push(member)
-        })
-
         channel.presence.get((err, members) => {
           if (err) {
-            return
+            throw err
           }
 
-          this.members = members
+          this.onlineMembers = members.length
+          channel.presence.enter()
         })
-
-        channel.presence.enter()
       })
     },
 
     logout() {
+      channel.presence.leave()
       this.code = null
       this.isSet = null
       this.userName = null
@@ -124,26 +118,3 @@ export default {
   },
 }
 </script>
-
-<style>
-/* .scrollbar-w-2::-webkit-scrollbar {
-  width: 0.25rem;
-  height: 0.25rem;
-}
-
-.scrollbar-track-blue-lighter::-webkit-scrollbar-track {
-  --bg-opacity: 1;
-  background-color: #f7fafc;
-  background-color: rgba(247, 250, 252, var(--bg-opacity));
-}
-
-.scrollbar-thumb-blue::-webkit-scrollbar-thumb {
-  --bg-opacity: 1;
-  background-color: #edf2f7;
-  background-color: rgba(237, 242, 247, var(--bg-opacity));
-}
-
-.scrollbar-thumb-rounded::-webkit-scrollbar-thumb {
-  border-radius: 0.25rem;
-} */
-</style>
