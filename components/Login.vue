@@ -4,25 +4,25 @@
     <h1 class="text-gray-700 text-4xl mb-5">Real Time Chat</h1>
     <h2 class="text-gray-700 text-lg mb-12">Ably 🧡 Nuxt.js</h2>
     <input
-      v-model="userName"
+      v-model="nickName"
       type="text"
       placeholder="Enter your user name"
       class="mb-5 w-72 focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-5 bg-gray-200 rounded-full py-3"
-      @keypress.enter="submit"
+      @keypress.enter="login"
     />
     <form>
       <button
         type="button"
-        :disabled="!userName"
+        :disabled="!nickName"
         class="inline-flex w-48 items-center justify-center rounded-full p-3 transition duration-500 ease-in-out text-white bg-blue-500 hover:bg-blue-400 focus:outline-none"
-        :class="{ 'opacity-50': !userName, 'cursor-not-allowed': !userName }"
-        @click="submit"
+        :class="{ 'opacity-50': !nickName, 'cursor-not-allowed': !nickName }"
+        @click="login"
       >
-        {{ !code ? 'Create chat' : 'Join chat' }}
+        {{ !chatId ? 'Create chat' : 'Join chat' }}
       </button>
     </form>
-    <span v-if="code" class="mt-5 text-xs"
-      >You will join chat <b>#{{ code }}</b>
+    <span v-if="chatId" class="mt-5 text-xs"
+      >You will join chat <b>#{{ chatId }}</b>
     </span>
   </div>
 </template>
@@ -33,19 +33,18 @@ import Logo from '@/components/Logo.vue'
 export default {
   components: { Logo },
   props: {
-    isSet: { type: Boolean, default: false },
-    code: { type: String, default: '' },
+    chatId: { type: String, default: '' },
   },
 
   data() {
     return {
-      userName: '',
+      nickName: '',
     }
   },
 
   methods: {
-    submit() {
-      this.$emit('submit', { userName: this.userName })
+    login() {
+      this.$emit('login', this.nickName)
     },
   },
 }

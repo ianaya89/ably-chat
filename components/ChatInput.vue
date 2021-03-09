@@ -2,20 +2,22 @@
   <div class="border-t-2 border-gray-200 px-4 pt-4 mb-2 sm:mb-0">
     <div class="relative flex">
       <input
+        v-model="newMessage"
         type="text"
         placeholder="Write Something"
-        :value="value"
         class="w-full focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-6 bg-gray-200 rounded-full py-3"
-        @input="$emit('input', $event.target.value)"
-        @keypress.enter="$emit('send', value)"
+        @keypress.enter="send"
       />
       <form class="absolute right-0 items-center inset-y-0 hidden sm:flex">
         <button
           type="button"
-          :disabled="!value"
+          :disabled="!newMessage"
           class="inline-flex items-center justify-center rounded-full h-12 w-12 transition duration-500 ease-in-out text-white bg-blue-500 hover:bg-blue-400 focus:outline-none"
-          :class="{ 'opacity-50': !value, 'cursor-not-allowed': !value }"
-          @click="$emit('send', value)"
+          :class="{
+            'opacity-50': !newMessage,
+            'cursor-not-allowed': !newMessage,
+          }"
+          @click="send"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -35,8 +37,15 @@
 
 <script>
 export default {
-  props: {
-    value: { type: String, default: '' },
+  data() {
+    return { newMessage: '' }
+  },
+
+  methods: {
+    send() {
+      this.$emit('send', this.newMessage)
+      this.newMessage = ''
+    },
   },
 }
 </script>

@@ -7,7 +7,7 @@
         <Logo />
         <div class="flex flex-col leading-tight">
           <div class="text-2xl mt-1 flex items-center">
-            <span class="text-gray-700 mr-3">{{ userName }}</span>
+            <span class="text-gray-700 mr-3">{{ nickName }}</span>
             <span :class="isOnline ? 'text-green-500' : 'text-red-500'">
               <svg width="10" height="10">
                 <circle cx="5" cy="5" r="5" fill="currentColor"></circle>
@@ -37,9 +37,7 @@
         </div>
       </div>
       <div class="flex flex-col items-center justify-between space-x-2">
-        <span class="mb-2 text-gray-400 text-sm">
-          {{ onlineMembers }} members</span
-        >
+        <span class="mb-2 text-gray-400 text-sm"> {{ members }} members</span>
         <button
           type="button"
           class="inline-flex items-center justify-center rounded-full h-8 w-8 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"
@@ -82,10 +80,10 @@ export default {
   components: { Logo, Message },
 
   props: {
-    userName: { type: String, default: '' },
+    nickName: { type: String, default: '' },
     chatUrl: { type: String, default: '' },
     isOnline: { type: Boolean, default: false },
-    onlineMembers: { type: Number, default: 0 },
+    members: { type: Number, default: 0 },
     messages: { type: Array, default: () => [] },
   },
 
@@ -99,7 +97,7 @@ export default {
     },
 
     isMine(message) {
-      return message.name === this.userName
+      return message.name === this.nickName
     },
   },
 }

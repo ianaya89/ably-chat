@@ -17,9 +17,9 @@ app.get('/auth', (req, res) => {
         .send('Error requesting token: ' + JSON.stringify(err))
     }
 
-    res.setHeader('Content-Type', 'application/json')
+    // res.setHeader('Content-Type', 'application/json')
     res.setHeader('Access-Control-Allow-Origin', '*')
-    res.send(JSON.stringify(tokenRequest))
+    res.send(tokenRequest)
   })
 })
 

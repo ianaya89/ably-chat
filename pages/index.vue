@@ -1,19 +1,19 @@
 <template>
   <main class="flex">
-    <Login v-if="!isSet" :is-set="isSet" :code="code" @submit="createCode" />
+    <Login v-if="!isLoggedIn" :chat-id="chatId" @login="createChat" />
     <div
       v-else
       class="flex-1 p:2 sm:p-6 justify-between flex flex-col h-screen"
     >
       <Chat
         :is-online="isOnline"
-        :user-name="userName"
+        :nick-name="nickName"
         :chat-url="chatUrl"
         :online-members="onlineMembers"
         :messages="messages"
         @logout="logout"
       />
-      <ChatInput v-model="newMessage" @send="sendMessage" />
+      <ChatInput @send="sendMessage" />
     </div>
   </main>
 </template>
@@ -33,37 +33,35 @@ export default {
 
   data() {
     return {
-      code: this.$route.query.code,
-      userName: '',
+      chatId: this.$route.query.chatId,
+      nickName: '',
       isOnline: false,
-      isSet: false,
+      isLoggedIn: false,
       messages: [],
       onlineMembers: 0,
-      newMessage: '',
-      clientId: null,
     }
   },
 
   computed: {
     chatUrl() {
       const { host, protocol } = window.location
-      return `${protocol}://${host}/?code=${this.code}`
+      return `${protocol}//${host}/?chatId=${this.chatId}`
     },
   },
 
   methods: {
-    createCode({ userName }) {
-      if (!userName) {
+    createChat(nickName) {
+      if (!nickName) {
         return
       }
 
-      this.userName = userName
-      this.isSet = true
-      this.code = this.code || uuidv4()
+      this.nickName = nickName
+      this.isLoggedIn = true
+      this.chatId = this.chatId || uuidv4()
       this.setupAbly()
 
-      if (!this.$route.query.code) {
-        this.$router.replace({ path: '/', query: { code: this.code } })
+      if (!this.$route.query.chatId) {
+        this.$router.replace({ path: '/', query: { chatId: this.chatId } })
       }
     },
 
@@ -72,8 +70,7 @@ export default {
         return
       }
 
-      channel.publish(this.userName, message)
-      this.newMessage = ''
+      channel.publish(this.nickName, message)
     },
 
     setupAbly() {
@@ -82,9 +79,9 @@ export default {
       })
 
       ably.connection.once('connected', () => {
-        this.clientId = ably.auth.clientId
         this.isOnline = true
-        channel = ably.channels.get('chat:' + this.code)
+
+        channel = ably.channels.get('chat:' + this.chatId)
 
         channel.subscribe((message) => {
           this.messages.push(message)
@@ -111,9 +108,9 @@ export default {
 
     logout() {
       channel.presence.leave()
-      this.code = null
-      this.isSet = null
-      this.userName = null
+      this.chatId = null
+      this.isLoggedIn = null
+      this.nickName = null
     },
   },
 }
